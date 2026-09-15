@@ -3,6 +3,7 @@ package core.basesyntax.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import core.basesyntax.db.Storage;
 import core.basesyntax.model.User;
@@ -21,6 +22,8 @@ public class RegistrationServiceImplTest {
         User expected = registrationService.register(user);
         assertNotNull(expected);
         assertEquals("validLogin", expected.getLogin());
+        assertTrue(Storage.people.contains(expected));
+        assertEquals(1, Storage.people.size());
     }
 
     @Test
@@ -94,6 +97,8 @@ public class RegistrationServiceImplTest {
         assertEquals(expected.getLogin(), user.getLogin());
         assertEquals(expected.getPassword(), user.getPassword());
         assertEquals(expected.getAge(), user.getAge());
+        assertTrue(Storage.people.contains(expected));
+        assertEquals(1, Storage.people.size());
     }
 
     @Test
@@ -103,5 +108,45 @@ public class RegistrationServiceImplTest {
         user.setPassword("123456");
         user.setAge(-10);
         assertThrows(RegistrationExceptions.class, () -> registrationService.register(user));
+    }
+
+    @Test
+    void register_loginLengthFiveCharacters_notOk() {
+        User user = new User();
+        user.setLogin("abcde");
+        user.setPassword("123456");
+        user.setAge(18);
+        assertThrows(RegistrationExceptions.class, () -> registrationService.register(user));
+        assertEquals(0, Storage.people.size());
+    }
+
+    @Test
+    void register_passwordLengthFiveCharacters_notOk() {
+        User user = new User();
+        user.setLogin("abcdef");
+        user.setPassword("12345");
+        user.setAge(18);
+        assertThrows(RegistrationExceptions.class, () -> registrationService.register(user));
+        assertEquals(0, Storage.people.size());
+    }
+
+    @Test
+    void register_loginEmpty_notOk() {
+        User user = new User();
+        user.setLogin("");
+        user.setPassword("123456");
+        user.setAge(18);
+        assertThrows(RegistrationExceptions.class, () -> registrationService.register(user));
+        assertEquals(0, Storage.people.size());
+    }
+
+    @Test
+    void register_passwordEmpty_notOk() {
+        User user = new User();
+        user.setLogin("abcdef");
+        user.setPassword("");
+        user.setAge(18);
+        assertThrows(RegistrationExceptions.class, () -> registrationService.register(user));
+        assertEquals(0, Storage.people.size());
     }
 }
