@@ -27,21 +27,26 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new RegistrationExceptions("User already exists");
         }
 
+        final User newUser = createNewUser(user);
+        return storageDao.add(newUser);
+    }
+
+    private static User createNewUser(final User user) {
         User newUser = new User();
         if (user.getLogin().length() < MIN_LOGIN_LENGTH) {
             throw new RegistrationExceptions("Login must be at least 6 characters long");
         }
         newUser.setLogin(user.getLogin());
 
-        newUser.setPassword(user.getPassword());
         if (user.getPassword().length() < MIN_PASSWORD_LENGTH) {
             throw new RegistrationExceptions("Password must be at least 6 characters long");
         }
+        newUser.setPassword(user.getPassword());
 
-        newUser.setAge(user.getAge());
         if (user.getAge() < MIN_AGE) {
             throw new RegistrationExceptions("User must be at least 18 years old");
         }
-        return storageDao.add(newUser);
+        newUser.setAge(user.getAge());
+        return newUser;
     }
 }

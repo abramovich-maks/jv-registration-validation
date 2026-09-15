@@ -1,4 +1,5 @@
 package core.basesyntax.service;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -155,3 +156,4 @@ public class RegistrationServiceImplTest {
         assertEquals(0, Storage.people.size());
     }
 }
+
