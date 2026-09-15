@@ -1,5 +1,4 @@
 package core.basesyntax.service;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -7,11 +6,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import core.basesyntax.db.Storage;
 import core.basesyntax.model.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class RegistrationServiceImplTest {
 
     private final RegistrationService registrationService = new RegistrationServiceImpl();
+
+    @BeforeEach
+    void setUp() {
+        Storage.people.clear();
+    }
 
     @Test
     void register_validUser_Ok() {
