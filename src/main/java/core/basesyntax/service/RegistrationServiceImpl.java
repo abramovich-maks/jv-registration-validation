@@ -5,12 +5,22 @@ import core.basesyntax.dao.StorageDaoImpl;
 import core.basesyntax.model.User;
 
 public class RegistrationServiceImpl implements RegistrationService {
+    public static final int MIN_LOGIN_LENGTH = 6;
+    public static final int MIN_PASSWORD_LENGTH = 6;
+    public static final int MIN_AGE = 18;
     private final StorageDao storageDao = new StorageDaoImpl();
 
     @Override
     public User register(User user) {
-        if (user.getLogin() == null || user.getPassword() == null || user.getAge() == null) {
-            throw new RegistrationExceptions("User data is incomplete");
+        if (user.getLogin() == null) {
+            throw new RegistrationExceptions("Login can't be null");
+        }
+        if (user.getPassword() == null) {
+            throw new RegistrationExceptions("Password can't be null");
+        }
+        if (user.getAge() == null) {
+            throw new RegistrationExceptions("Not valid age: " + user.getAge()
+                    + ". Min allowed age is " + MIN_AGE);
         }
 
         if (storageDao.get(user.getLogin()) != null) {
@@ -18,18 +28,18 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         User newUser = new User();
-        if (user.getLogin().length() < 6) {
+        if (user.getLogin().length() < MIN_LOGIN_LENGTH) {
             throw new RegistrationExceptions("Login must be at least 6 characters long");
         }
         newUser.setLogin(user.getLogin());
 
         newUser.setPassword(user.getPassword());
-        if (user.getPassword().length() < 6) {
+        if (user.getPassword().length() < MIN_PASSWORD_LENGTH) {
             throw new RegistrationExceptions("Password must be at least 6 characters long");
         }
 
         newUser.setAge(user.getAge());
-        if (user.getAge() < 18) {
+        if (user.getAge() < MIN_AGE) {
             throw new RegistrationExceptions("User must be at least 18 years old");
         }
         return storageDao.add(newUser);
