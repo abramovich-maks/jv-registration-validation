@@ -12,41 +12,34 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public User register(User user) {
+        if (user == null) {
+            throw new RegistrationException("User can't be null");
+        }
         if (user.getLogin() == null) {
-            throw new RegistrationExceptions("Login can't be null");
+            throw new RegistrationException("Login can't be null");
         }
         if (user.getPassword() == null) {
-            throw new RegistrationExceptions("Password can't be null");
+            throw new RegistrationException("Password can't be null");
         }
         if (user.getAge() == null) {
-            throw new RegistrationExceptions("Not valid age: " + user.getAge()
+            throw new RegistrationException("Not valid age: " + user.getAge()
                     + ". Min allowed age is " + MIN_AGE);
         }
-
         if (storageDao.get(user.getLogin()) != null) {
-            throw new RegistrationExceptions("User already exists");
+            throw new RegistrationException("User already exists");
         }
-
-        final User newUser = createNewUser(user);
-        return storageDao.add(newUser);
-    }
-
-    private static User createNewUser(final User user) {
-        User newUser = new User();
         if (user.getLogin().length() < MIN_LOGIN_LENGTH) {
-            throw new RegistrationExceptions("Login must be at least 6 characters long");
+            throw new RegistrationException("Login must be at least " + MIN_LOGIN_LENGTH + " characters long");
         }
-        newUser.setLogin(user.getLogin());
-
         if (user.getPassword().length() < MIN_PASSWORD_LENGTH) {
-            throw new RegistrationExceptions("Password must be at least 6 characters long");
+            throw new RegistrationException("Password must be at least " + MIN_PASSWORD_LENGTH + " characters long");
         }
-        newUser.setPassword(user.getPassword());
-
         if (user.getAge() < MIN_AGE) {
-            throw new RegistrationExceptions("User must be at least 18 years old");
+            throw new RegistrationException("User must be at least " + MIN_AGE + " years old");
         }
-        newUser.setAge(user.getAge());
-        return newUser;
+        user.setLogin(user.getLogin());
+        user.setPassword(user.getPassword());
+        user.setAge(user.getAge());
+        return storageDao.add(user);
     }
 }
