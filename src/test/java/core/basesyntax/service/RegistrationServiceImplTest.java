@@ -21,15 +21,13 @@ public class RegistrationServiceImplTest {
 
     @Test
     void register_nullUser_notOk() {
-         assertThrows(RegistrationException.class, () -> registrationService.register(null));
+        assertThrows(RegistrationException.class, () -> registrationService.register(null));
+        assertEquals(0, Storage.people.size());
     }
 
     @Test
     void register_validUser_ok() {
-        User user = new User();
-        user.setLogin("validLogin");
-        user.setPassword("validPassword");
-        user.setAge(20);
+        User user = createValidUser();
         User expected = registrationService.register(user);
         assertNotNull(expected);
         assertEquals("validLogin", expected.getLogin());
@@ -39,67 +37,66 @@ public class RegistrationServiceImplTest {
 
     @Test
     void register_userExistsInTheStorage_notOk() {
-        User user = new User();
-        user.setLogin("validLogin");
-        user.setPassword("validPassword");
-        user.setAge(20);
-        Storage.people.add(user);
-        assertThrows(RegistrationException.class, () -> registrationService.register(user));
+        User existingUser = createValidUser();
+        Storage.people.add(existingUser);
+
+        User newUser = createValidUser();
+        newUser.setPassword("anotherPassword");
+
+        assertThrows(RegistrationException.class, () -> registrationService.register(newUser));
+        assertEquals(1, Storage.people.size());
     }
 
     @Test
-    void register_userLoginLessThanSixCharacters_notOk() {
-        User user = new User();
+    void register_loginTooShort_notOk() {
+        User user = createValidUser();
         user.setLogin("zzz");
-        user.setPassword("validPassword");
-        user.setAge(20);
         assertThrows(RegistrationException.class, () -> registrationService.register(user));
+        assertEquals(0, Storage.people.size());
     }
 
     @Test
-    void register_userPasswordLessThanSixCharacters_notOk() {
-        User user = new User();
-        user.setLogin("validLogin");
+    void register_passwordTooShort_notOk() {
+        User user = createValidUser();
         user.setPassword("123");
-        user.setAge(20);
         assertThrows(RegistrationException.class, () -> registrationService.register(user));
+        assertEquals(0, Storage.people.size());
     }
 
     @Test
-    void register_userAgeLess18Years_notOk() {
-        User user = new User();
-        user.setLogin("validLogin");
-        user.setPassword("validPassword");
+    void register_userTooYoung_notOk() {
+        User user = createValidUser();
         user.setAge(17);
         assertThrows(RegistrationException.class, () -> registrationService.register(user));
+        assertEquals(0, Storage.people.size());
     }
 
     @Test
     void register_nullAge_notOk() {
-        User user = new User();
-        user.setLogin("validLogin");
-        user.setPassword("validPassword");
+        User user = createValidUser();
+        user.setAge(null);
         assertThrows(RegistrationException.class, () -> registrationService.register(user));
+        assertEquals(0, Storage.people.size());
     }
 
     @Test
     void register_nullLogin_notOk() {
-        User user = new User();
-        user.setPassword("validPassword");
-        user.setAge(20);
+        User user = createValidUser();
+        user.setLogin(null);
         assertThrows(RegistrationException.class, () -> registrationService.register(user));
+        assertEquals(0, Storage.people.size());
     }
 
     @Test
     void register_nullPassword_notOk() {
-        User user = new User();
-        user.setLogin("validLogin");
-        user.setAge(20);
+        User user = createValidUser();
+        user.setPassword(null);
         assertThrows(RegistrationException.class, () -> registrationService.register(user));
+        assertEquals(0, Storage.people.size());
     }
 
     @Test
-    void register_createUserWithLoginAndPasswordLengthEqualsSixAndAge18_ok() {
+    void register_minValidValues_ok() {
         User user = new User();
         user.setLogin("abcdef");
         user.setPassword("123456");
@@ -113,52 +110,50 @@ public class RegistrationServiceImplTest {
     }
 
     @Test
-    void register_createUserWithNegativeAge_notOk() {
-        User user = new User();
-        user.setLogin("abcdef");
-        user.setPassword("123456");
+    void register_negativeAge_notOk() {
+        User user = createValidUser();
         user.setAge(-10);
         assertThrows(RegistrationException.class, () -> registrationService.register(user));
     }
 
     @Test
     void register_loginLengthFiveCharacters_notOk() {
-        User user = new User();
+        User user = createValidUser();
         user.setLogin("abcde");
-        user.setPassword("123456");
-        user.setAge(18);
         assertThrows(RegistrationException.class, () -> registrationService.register(user));
         assertEquals(0, Storage.people.size());
     }
 
     @Test
     void register_passwordLengthFiveCharacters_notOk() {
-        User user = new User();
-        user.setLogin("abcdef");
+        User user = createValidUser();
         user.setPassword("12345");
-        user.setAge(18);
         assertThrows(RegistrationException.class, () -> registrationService.register(user));
         assertEquals(0, Storage.people.size());
     }
 
     @Test
     void register_loginEmpty_notOk() {
-        User user = new User();
+        User user = createValidUser();
         user.setLogin("");
-        user.setPassword("123456");
-        user.setAge(18);
         assertThrows(RegistrationException.class, () -> registrationService.register(user));
         assertEquals(0, Storage.people.size());
     }
 
     @Test
     void register_passwordEmpty_notOk() {
-        User user = new User();
-        user.setLogin("abcdef");
+        User user = createValidUser();
         user.setPassword("");
-        user.setAge(18);
         assertThrows(RegistrationException.class, () -> registrationService.register(user));
         assertEquals(0, Storage.people.size());
+    }
+
+    private User createValidUser() {
+        User user = new User();
+        user.setLogin("validLogin");
+        user.setPassword("validPassword");
+        user.setAge(20);
+        return user;
     }
 }
 
